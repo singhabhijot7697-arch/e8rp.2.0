@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+console.log("TOKEN:", process.env.TOKEN ? "✅ Loaded" : "❌ Missing");
 const {
   Client,
   GatewayIntentBits,
