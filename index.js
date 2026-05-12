@@ -1,5 +1,5 @@
 require('dotenv').config();
-console.log("TOKEN:", process.env.TOKEN ? "✅ Loaded" : "❌ Missing");
+
 const {
   Client,
   GatewayIntentBits,
@@ -10,7 +10,9 @@ const {
 const fs = require('fs');
 const path = require('path');
 
-// ✅ EXPRESS (Render 24/7)
+console.log("TOKEN:", process.env.TOKEN ? "✅ Loaded" : "❌ Missing");
+
+// ✅ EXPRESS (Render keep alive)
 const express = require('express');
 const app = express();
 
@@ -75,11 +77,15 @@ if (fs.existsSync(eventPath)) {
 
 
 // ✅ AUTOMOD
-const { runAutomod } = require('./utils/automod');
+try {
+  const { runAutomod } = require('./utils/automod');
 
-client.on('messageCreate', async message => {
-  runAutomod(message);
-});
+  client.on('messageCreate', async message => {
+    runAutomod(message);
+  });
+} catch {
+  console.log("⚠️ Automod not loaded");
+}
 
 
 // ✅ INTERACTIONS
@@ -111,11 +117,17 @@ client.on('interactionCreate', async interaction => {
 });
 
 
-// ✅ READY
-client.once('ready', () => {
+// ✅ READY EVENT (FIXED)
+client.once('clientReady', () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 });
 
 
-// ✅ LOGIN
-client.login(process.env.TOKEN);
+// ✅ LOGIN (WITH ERROR HANDLING)
+client.login(process.env.TOKEN)
+  .then(() => {
+    console.log("✅ Login success");
+  })
+  .catch(err => {
+    console.error("❌ Login error:", err);
+  });
